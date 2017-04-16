@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class ReadFile
 {
@@ -79,18 +81,19 @@ class TFIDFCalc
 public class TFIDFSpamFilter
 {
 
-	public static int numberOfOccurrences(String source, String sentence)
+	public static int numberOfOccurrences(String haystack, String needle)
 	{
-		int occurrences = 0;
+		int count = 0;
 
-		if (source.contains(sentence))
+		Pattern pattern = Pattern.compile(".*\\b" + needle + "\\S*\\b.*");
+		Matcher matcher = pattern.matcher(haystack);
+
+		while (matcher.find())
 		{
-			int withSentenceLength = source.length();
-			int withoutSentenceLength = source.replace(sentence, "").length();
-			occurrences = (withSentenceLength - withoutSentenceLength) / sentence.length();
+			count++;
 		}
 
-		return occurrences;
+		return count;
 	}
 
 	public static void main(String[] args)
@@ -102,7 +105,6 @@ public class TFIDFSpamFilter
 		{
 			doc[i] = new ReadFile().readCharBychar("src/spamfilter/doc" + (i + 1) + ".txt");
 		}
-
 
 		Integer[][] st = new Integer[doc.length][spamDictMap.size()];
 
@@ -135,8 +137,9 @@ public class TFIDFSpamFilter
 			TFIDFCalc calc = new TFIDFCalc();
 			for (int j = 0; j < st[i].length; j++)
 			{
-//				System.out.println("doc" + (i + 1) + " Term: " + spamDictMap.get(j + 1) + " TFIDF: "
-//						+ calc.tfIdf(st[i][j], doc.length, docWithTerm[j]));
+				// System.out.println("doc" + (i + 1) + " Term: " +
+				// spamDictMap.get(j + 1) + " TFIDF: "
+				// + calc.tfIdf(st[i][j], doc.length, docWithTerm[j]));
 				count += calc.tfIdf(st[i][j], doc.length, docWithTerm[j]);
 			}
 			System.out.println("doc" + (i + 1) + " : " + count);
